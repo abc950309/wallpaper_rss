@@ -1,8 +1,5 @@
 <?php
-define('DB_NAME', '');
-define('DB_USER', '');
-define('DB_PASSWORD', '');
-define('DB_HOST', '');
+require_once('config.php');
 
 $self_url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"];
 

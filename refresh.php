@@ -1,8 +1,5 @@
 <?php
-define('DB_NAME', '');
-define('DB_USER', '');
-define('DB_PASSWORD', '');
-define('DB_HOST', '');
+require_once('config.php');
 
 ignore_user_abort();
 set_time_limit(0);
@@ -10,14 +7,11 @@ set_time_limit(0);
 ini_set('user_agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.146 Safari/537.36;');
 
 $server_link = mysql_connect(DB_HOST, DB_USER, DB_PASSWORD, MYSQL_CLIENT_INTERACTIVE);
-//$server_link = mysql_pconnect(DB_HOST, DB_USER, DB_PASSWORD, MySQL_CLIENT_INTERACTIVE);
-
 $dbLink = mysql_select_db(DB_NAME, $server_link);
 mysql_query("set names 'utf8'");
 
 echo '<pre>';
 
-// example: 'http://wall.alphacoders.com/by_category.php?id=33&page=1&sort=newest'
 $p_url = 'http://wall.alphacoders.com/%s.php?id=%s&sort=%s&page=%d';
 
 $sql_query = "SELECT * FROM `wallpaper_page_sheet`";
@@ -47,17 +41,25 @@ print_r($pics_sheet);
 $sql_query = 'TRUNCATE wallpaper_pic_sheet';
 mysql_query($sql_query);
 
+mysql_close($server_link);
+
 foreach ($pages_sheet as $page_info) {
 	$src_list = refresh_pic($page_info, $p_url, $pics_sheet);
 	
 	echo 'src_list: ';
 	print_r($src_list);
 	
+	$server_link = mysql_connect(DB_HOST, DB_USER, DB_PASSWORD, MYSQL_CLIENT_INTERACTIVE);
+	$dbLink = mysql_select_db(DB_NAME, $server_link);
+	mysql_query("set names 'utf8'");
+	
 	foreach ($src_list as $db_src) {
 		$sql_query = 'INSERT INTO `samcuico_test`.`wallpaper_pic_sheet` (`src`, `page_uuid`, `length`, `title`) VALUES (\''
 			. $db_src['src'] . '\', \'' . $page_info['uuid'] . '\', \'' . $db_src['length'] . '\', \'' . $db_src['title'] . '\');';
 		mysql_query($sql_query);
 	}
+	
+	mysql_close($server_link);
 }
 
 echo '</pre>';
